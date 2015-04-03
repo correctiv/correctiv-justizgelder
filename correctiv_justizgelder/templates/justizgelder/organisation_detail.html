@@ -1,0 +1,189 @@
+{% extends "justizgelder/base.html" %}
+
+{% load humanize %}
+{% load justizgelder_tags %}
+
+{% block title %}Empfänger {{ object.name }}{% endblock %}
+
+{% block additional_meta %}
+<meta name="description" content="{{ object.name }} hat {{ object.sum_fines }} Euro an Geldzuwendungen von der Justiz erhalten.">
+
+{% endblock %}
+
+{% block content %}
+<div itemscope itemtype="http://schema.org/Organization">
+
+<div class="page-header">
+  <div class="row">
+    <div class="col-lg-9 col-md-8 col-sm-12">
+      <h2 itemprop="name">
+        {{ object.name }}
+      </h2>
+      <h3>
+        <span class="label label-info">
+          Gesamtsumme: {{ object.sum_fines|intcomma }}&nbsp;€
+        </span>
+      </h3>
+    </div>
+    <div class="col-lg-3 col-md-4 col-sm-12">
+      {% include "_support.html" %}
+    </div>
+  </div>
+</div>
+
+{% if not request.GET.embed %}
+  <div class="row">
+    <div class="col-lg-6 col-xs-6">
+      <p>
+        <a class="btn btn-default" href="{% url 'justizgelder:search' %}">
+          <span class="glyphicon glyphicon-arrow-left"></span>
+          Zurück zur Suche
+        </a>
+      </p>
+    </div>
+    <div class="col-lg-6 col-xs-6">
+      <p class="text-right">
+        {# Ouch, duplicated hardcoded flatpage URL #}
+        <a class="btn btn-default js-info-modal" href="/justizgelder/details/" data-target="#justizgelder-detail">
+            <span class="glyphicon glyphicon-info-sign"></span>
+            Infos zur Datenbank
+        </a>
+      </p>
+    </div>
+  </div>
+{% endif %}
+{% if object.note %}
+  <div class="row">
+    <div class="col-lg-8">
+      <h3>Hinweise zu dieser Organisation</h3>
+      <p>
+        {{ object.note|linebreaks }}
+      </p>
+    </div>
+  </div>
+{% endif %}
+
+<div class="row">
+  <div class="col-lg-12">
+    <table class="table table-responsive">
+      <thead>
+        <tr>
+          <th>
+            Name der Einrichtung
+          </th>
+          <th class="text-right">
+            Betrag
+          </th>
+          <th>
+            Bundesland
+          </th>
+          <th>
+            Jahr
+          </th>
+          <th>
+            Justizbezirk
+          </th>
+          <th>
+            Quelle
+          </th>
+          <th>
+            Details
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+      {% with fines=object.fines.all_with_amount %}
+        {% for fine in fines %}
+        <tr>
+          <td>
+            {{ fine.name }}
+          </td>
+          <td class="text-right">
+            {{ fine.amount|intcomma_floatformat:2 }}&nbsp;€
+          </td>
+          <td>{{ fine.state_label }}</td>
+          <td>{{ fine.year }}</td>
+          <td>{{ fine.department_label }}</td>
+          <td>
+            {% with source_file=fine.source_file_url %}
+              {% if source_file %}
+                <a href="{{ MEDIA_URL }}{{ source_file }}" target="_blank">
+                  {{ fine.source_file_extension|upper }}
+                </a>
+              {% endif %}
+            {% endwith %}
+          </td>
+          <td class="text-muted">
+            {% if fine.note %}
+              <p>
+                <a href="#" class="note" data-toggle="popover" title="Anmerkung" data-content="{{ fine.note }}">Anmerkung</a>
+              </p>
+            {% endif %}
+            {% if fine.city or fine.postcode %}
+              {{ fine.city }} {{ fine.postcode }}<br/>
+            {% endif %}
+            {% if fine.address %}
+              {{ fine.address|linebreaksbr }}<br/>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      {% endwith %}
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+    {% if not request.GET.embed %}
+
+    {% if mlt.results|length > 1 %}
+    <hr/>
+    <h3>
+      <a href="{% url 'justizgelder:search' %}?q={{ object.name|urlencode }}">
+        Ähnliche Empfänger
+      </a>
+    </h3>
+    <ul class="list-unstyled">
+      {% for obj in mlt.results %}
+        {% if obj.id != object.id %}
+          <li>
+            <a href="{% url 'justizgelder:organisation_detail' slug=obj.slug %}">
+              {{ obj.name }}
+            </a>
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+    {% endif %}
+    <hr/>
+        {% url "justizgelder:search" as justizgelder_search %}
+
+        {% with formatted_sum=object.sum_fines|intcomma escaped_name=object.name|urlencode %}
+        {% with sharetext=object.name|add:" hat "|add:formatted_sum|add:" € aus der Justiz bekommen"|urlencode url=SITE_URL|add:justizgelder_search|add:"?q="|add:escaped_name|urlencode %}
+
+        {% include "justizgelder/_action_area.html" with sharetext=sharetext url=url embed_url=SITE_URL|add:object.get_absolute_url|add_embed %}
+
+        {% endwith %}
+        {% endwith %}
+
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+  {{ block.super }}
+  <script>
+    $('.note').popover({placement: 'bottom'});
+    $('.js-info-modal').click(function(e){
+        if (e.ctrlKey || e.metaKey) {
+            return;
+        }
+        e.preventDefault();
+        $($(this).data('target')).modal({
+          path: false
+        });
+    });
+  </script>
+{% endblock %}

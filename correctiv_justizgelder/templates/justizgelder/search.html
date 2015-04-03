@@ -1,0 +1,53 @@
+{% extends base_template %}
+
+{% load humanize %}
+{% load justizgelder_tags %}
+
+{% block object_list %}
+    <p>
+        {% if query %}„<mark>{{ query }}</mark>“ ergab{% endif %}
+        <strong>{{ page_obj.paginator.count|intcomma }} Treffer</strong> mit insgesamt
+        <strong>{{ result.aggregations.amount_filtered.fines.filtered_total.total_sum.value|intcomma_floatformat:2 }}&nbsp;€</strong>
+    </p>
+    {% if object_list %}
+        <table class="table">
+          <thead>
+            <tr>
+                <th>
+                    Name der Einrichtung
+                </th>
+                <th class="text-right">
+                    Gesamtbetrag<br/>2011-2013
+                </th>
+                {% if query %}
+                    <th class="text-muted">
+                    </th>
+              {% endif %}
+            </tr>
+          </thead>
+          <tbody>
+        {% for result in object_list %}
+            <tr>
+                <td>
+                    <a href="{% url 'justizgelder:organisation_detail' slug=result.slug %}">
+                        {{ result.name }}
+                    </a>
+                </td>
+                <td class="text-right" title="{{ result.fines|length }} dokumentierte Erfassunge(n)">
+                    {{ result.amount|intcomma_floatformat:2 }}&nbsp;€
+                </td>
+                {% if query %}
+                <td class="text-muted">
+                    {{ result.fines_text_highlight|safe }}
+                </td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+        </table>
+        {% if is_paginated %}
+            {% include "pagination.html" with page_obj=page_obj getvars="&"|add:getvars %}
+        {% endif %}
+    {% else %}
+        <p>Keine Ergebnisse gefunden</p>
+    {% endif %}
+{% endblock %}

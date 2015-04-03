@@ -1,0 +1,7 @@
+{{ object.organisation.name }}
+{{ object.name }}
+{{ object.city }}
+{{ object.postcode }}
+{{ object.address }}
+{{ object.department_label }}
+{{ object.department_detail }}

@@ -1,0 +1,12 @@
+{% extends CMS_TEMPLATE %}
+
+{% load justizgelder_tags %}
+
+{% block outer_body %}
+{% block content %}{% endblock %}
+{% endblock %}
+
+{% block body-sheath %}
+  {% facet_vars "" "getvars" %}
+  {% block object_list %}{% endblock %}
+{% endblock %}
