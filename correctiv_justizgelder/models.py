@@ -79,7 +79,7 @@ class Fine(models.Model):
     note = models.TextField(blank=True)
 
     city = models.CharField(max_length=255, blank=True)
-    postcode = models.CharField(max_length=5, blank=True)
+    postcode = models.CharField(max_length=10, blank=True)
 
     objects = FineManager()
 
