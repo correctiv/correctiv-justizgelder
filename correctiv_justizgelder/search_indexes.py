@@ -309,7 +309,6 @@ class OrganisationIndex(SearchIndex):
                         }
                     },
                     'state': {'type': 'string', 'index': 'not_analyzed', 'store': True},
-                    'state_name': {'type': 'string', 'index': 'not_analyzed'},
                     'department': {'type': 'string', 'index': 'not_analyzed'},
                     'department_detail': {'type': 'string', 'index': 'not_analyzed'},
                     'year': {'type': 'integer', 'index': 'not_analyzed', 'store': True},
@@ -330,7 +329,6 @@ class OrganisationIndex(SearchIndex):
                 'id': f.pk,
                 'state': f.state,
                 'name': f.original_name,
-                'state_name': f.state_label,
                 'department': f.department,
                 'department_detail': f.department_detail,
                 'year': f.year,
