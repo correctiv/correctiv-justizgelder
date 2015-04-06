@@ -33,10 +33,10 @@ setup(
     author_email='stefan.wehrmeyer@correctiv.org',
     packages=find_packages(),
     install_requires=[
-        'Django<1.7',
+        'Django<1.8',
         'pyelasticsearch',
         'elasticsearch',
-        'South',
+        'unicode-slugify',
     ],
     include_package_data=True,
     classifiers=[
