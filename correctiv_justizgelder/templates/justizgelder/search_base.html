@@ -1,13 +1,13 @@
 {% extends 'justizgelder/base.html' %}
 
-{% load humanize %}
+{% load static humanize %}
 {% load justizgelder_tags %}
 
 {% block title %}Suche{% if query %} "{{ query }}"{% endif %}{% endblock %}
 
 {% block extra_style %}
     {{ block.super }}
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/jquery.nouislider.css"/>
+    <link rel="stylesheet" href="{% static "justizgelder/css/jquery.nouislider.css" %}"/>
     <style type="text/css">
     .noUi-connect {
       background: #428bca;
@@ -185,7 +185,7 @@
 
 {% block scripts %}
     {{ block.super }}
-    <script src="{{ STATIC_URL }}js/jquery.nouislider.min.js"></script>
+    <script src="{% static "justizgelder/js/jquery.nouislider.min.js" %}"></script>
     <script>
     (function(){
         var max_value = {{ result.aggregations.max_amount.value|floatformat:0 }} + 1000;
