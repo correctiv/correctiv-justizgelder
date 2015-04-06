@@ -97,7 +97,17 @@ class Command(BaseCommand):
         return fine
 
     def create_aggregates(self):
-        from django.db import connection
+        from django.db import connections
 
-        cursor = connection.cursor()
-        cursor.execute("UPDATE justizgelder_organisation SET sum_fines=(SELECT SUM(justizgelder_fine.amount) FROM justizgelder_fine WHERE justizgelder_fine.organisation_id=justizgelder_organisation.id);")
+        if 'data' in connections:
+            con = connections['data']
+        else:
+            con = connections['default']
+
+        cursor = con.cursor()
+        cursor.execute("""UPDATE correctiv_justizgelder_organisation
+            SET sum_fines=(
+                SELECT SUM(correctiv_justizgelder_fine.amount) FROM
+                 correctiv_justizgelder_fine WHERE
+                  correctiv_justizgelder_fine.organisation_id=correctiv_justizgelder_organisation.id
+        );""")
