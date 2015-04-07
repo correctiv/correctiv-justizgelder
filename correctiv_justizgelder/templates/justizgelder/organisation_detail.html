@@ -1,12 +1,12 @@
 {% extends "justizgelder/base.html" %}
 
-{% load humanize %}
+{% load i18n humanize %}
 {% load justizgelder_tags %}
 
-{% block title %}Empfänger {{ object.name }}{% endblock %}
+{% block title %}{% blocktrans with name=object.name %}Recipient {{ name }}{% endblocktrans %}{% endblock %}
 
 {% block additional_meta %}
-<meta name="description" content="{{ object.name }} hat {{ object.sum_fines }} Euro an Geldzuwendungen von der Justiz erhalten.">
+<meta name="description" content="{% blocktrans with name=object.name sum=object.sum_fines %}{{ name }} received {{ sum }} Euro as donations from the judiciary.{% endblocktrans %}">
 
 {% endblock %}
 
@@ -21,12 +21,9 @@
       </h2>
       <h3>
         <span class="label label-info">
-          Gesamtsumme: {{ object.sum_fines|intcomma }}&nbsp;€
+          {% blocktrans with sum=object.sum_fines|intcomma %}Total sum: {{ sum}}&nbsp;€{% endblocktrans %}
         </span>
       </h3>
-    </div>
-    <div class="col-lg-3 col-md-4 col-sm-12">
-      {% include "_support.html" %}
     </div>
   </div>
 </div>
@@ -37,17 +34,12 @@
       <p>
         <a class="btn btn-default" href="{% url 'justizgelder:search' %}">
           <span class="glyphicon glyphicon-arrow-left"></span>
-          Zurück zur Suche
+          {% trans "Back to the search" %}
         </a>
       </p>
     </div>
     <div class="col-lg-6 col-xs-6">
       <p class="text-right">
-        {# Ouch, duplicated hardcoded flatpage URL #}
-        <a class="btn btn-default js-info-modal" href="/justizgelder/details/" data-target="#justizgelder-detail">
-            <span class="glyphicon glyphicon-info-sign"></span>
-            Infos zur Datenbank
-        </a>
       </p>
     </div>
   </div>
@@ -55,7 +47,7 @@
 {% if object.note %}
   <div class="row">
     <div class="col-lg-8">
-      <h3>Hinweise zu dieser Organisation</h3>
+      <h3>{% trans "Notes about this organisation" %}</h3>
       <p>
         {{ object.note|linebreaks }}
       </p>
@@ -69,25 +61,25 @@
       <thead>
         <tr>
           <th>
-            Name der Einrichtung
+            {% trans "Name of this organisation" %}
           </th>
           <th class="text-right">
-            Betrag
+            {% trans "Amount" %}
           </th>
           <th>
-            Bundesland
+            {% trans "State" %}
           </th>
           <th>
-            Jahr
+            {% trans "Year" %}
           </th>
           <th>
-            Justizbezirk
+            {% trans "Judicial district" %}
           </th>
           <th>
-            Quelle
+            {% trans "Source" %}
           </th>
           <th>
-            Details
+            {% trans "Details" %}
           </th>
         </tr>
       </thead>
@@ -116,7 +108,8 @@
           <td class="text-muted">
             {% if fine.note %}
               <p>
-                <a href="#" class="note" data-toggle="popover" title="Anmerkung" data-content="{{ fine.note }}">Anmerkung</a>
+                {% trans "Notes" as notes %}
+                <a href="#" class="note" data-toggle="popover" title="{{ notes }}" data-content="{{ fine.note }}">{{ notes }}</a>
               </p>
             {% endif %}
             {% if fine.city or fine.postcode %}
@@ -140,7 +133,7 @@
     <hr/>
     <h3>
       <a href="{% url 'justizgelder:search' %}?q={{ object.name|urlencode }}">
-        Ähnliche Empfänger
+        {% trans "Similar recipients" %}
       </a>
     </h3>
     <ul class="list-unstyled">
@@ -159,7 +152,8 @@
         {% url "justizgelder:search" as justizgelder_search %}
 
         {% with formatted_sum=object.sum_fines|intcomma escaped_name=object.name|urlencode %}
-        {% with sharetext=object.name|add:" hat "|add:formatted_sum|add:" € aus der Justiz bekommen"|urlencode url=SITE_URL|add:justizgelder_search|add:"?q="|add:escaped_name|urlencode %}
+        {% captureas sharetext %}{% blocktrans with name=object.name sum=formatted_sum %}{{ name }} received {{ sum }} € from the judiciary: {% endblocktrans %}{% endcaptureas %}
+        {% with sharetext=sharetext|urlencode url=SITE_URL|add:justizgelder_search|add:"?q="|add:escaped_name|urlencode %}
 
         {% include "justizgelder/_action_area.html" with sharetext=sharetext url=url embed_url=SITE_URL|add:object.get_absolute_url|add_embed %}
 

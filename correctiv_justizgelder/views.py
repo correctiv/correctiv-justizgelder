@@ -28,6 +28,7 @@ class OrganisationSearchView(ListView):
 
 
 class OrganisationDetail(DetailView):
+    template_name = 'justizgelder/organisation_detail.html'
     model = Organisation
 
     def get_context_data(self, **kwargs):

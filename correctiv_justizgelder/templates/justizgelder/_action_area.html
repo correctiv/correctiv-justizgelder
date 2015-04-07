@@ -1,12 +1,13 @@
+{% load i18n %}
 <div class="row">
   <div class="col-lg-4 col-md-4 col-sm-6">
     <div class="thumbnail">
       <div class="caption">
         <h4 class="text-center">
           <span class="glyphicon glyphicon-share"></span>
-          Interessante Organisation?
+          {% trans "Interesting Organisation?" %}
         </h4>
-        <p>Teilen Sie diese Geld-Zuweisungen:</p>
+        <p>{% trans "Share this donation:" %}</p>
 
         <ul class="list-unstyled">
           <li>
@@ -28,9 +29,6 @@
             </a>
           </li>
         </ul>
-        <p>
-          Folgen Sie uns auf <a href="https://twitter.com/correctiv_org">Twitter!</a>
-        </p>
       </div>
     </div>
   </div>
@@ -39,11 +37,10 @@
       <div class="caption">
         <h4 class="text-center">
           <span class="glyphicon glyphicon-list-alt"></span>
-          Diese Zuweisungen einbetten
+          {% trans "Embed this judicial donation" %}
         </h4>
         <p>
-          Wollen Sie diese Zuweisungen auf Ihrer Website einbinden?
-          Kopieren Sie diesen iFrame-Code:
+          {% trans "Do you want to embed this donation on your website? Just copy this iFrame code:" %}
         </p>
         <textarea readonly style="width:100%" rows="4">{% spaceless %}
           <iframe frameborder="0" width="100%" height="480px" src="{{ embed_url }}"></iframe>
@@ -56,18 +53,17 @@
       <div class="caption">
         <h4 class="text-center">
           <span class="glyphicon glyphicon-envelope"></span>
-          Kontaktieren Sie uns!
+          {% trans "Contact us!" %}
         </h4>
-        <p>Ihnen sind <strong>Missstände</strong> bei der Verteilung von Geldzuwendungen durch Richter und Staatsanwälte bekannt? Sie haben Informationen zu Personen oder Einrichtungen, die wir uns <strong>genauer anschauen</strong> sollten?</p>
         <p>
           <a href="mailto:justizgelder@correctiv.org">
             <span class="glyphicon glyphicon-arrow-right"></span>
-            Senden Sie uns eine E-Mail
+            {% trans "Send us an email" %}
           </a>
           <br/>
           <a href="https://correctiv-upload.org/" target="_blank">
             <span class="glyphicon glyphicon-arrow-right"></span>
-            Senden Sie uns verschlüsselt Nachrichten und Dokumente
+            {% trans "Send us encrypted messages and documents" %}
           </a>
         </p>
       </div>

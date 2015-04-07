@@ -1,9 +1,9 @@
 {% extends 'justizgelder/base.html' %}
 
-{% load static humanize %}
+{% load i18n static humanize %}
 {% load justizgelder_tags %}
 
-{% block title %}Suche{% if query %} "{{ query }}"{% endif %}{% endblock %}
+{% block title %}{% trans "Judiciary donations search" %}{% if query %} "{{ query }}"{% endif %}{% endblock %}
 
 {% block extra_style %}
     {{ block.super }}
@@ -29,7 +29,7 @@
         <div class="col-lg-3 col-md-4 col-sm-12">
         </div>
         <div class="col-lg-9 col-md-8 col-sm-12">
-            <h2>Suche nach Zuwendungs&shy;empfängern</h2>
+            <h2>{% trans "Search for recipients" %}</h2>
             <form method="get" action="?{{ getvars }}">
                 {{ form.amount_gte }}
                 {{ form.amount_lte }}
@@ -38,12 +38,12 @@
                 <div class="input-group">
                     {{ form.q }}
                     <span class="input-group-btn">
-                        <button class="btn btn-default" type="submit">Suchen</button>
+                        <button class="btn btn-default" type="submit">{% trans "Search" %}</button>
                     </span>
                 </div><!-- /input-group -->
                 <div class="pull-right">
                     <p>
-                    Sortiere nach:
+                    {% trans "Sort by:" %}
                     {% for radio in form.sort %}
                         <label class="radio-inline">
                             {{ radio }}
@@ -56,7 +56,7 @@
     </div>
     <div class="row">
         <div class="col-lg-3 col-md-4 col-sm-3">
-            <h4>Betrag einschränken</h4>
+            <h4>{% trans "Limit amount" %}</h4>
             <div class="row">
                 <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 col-xs-offset-1">
                     <div id="amount-range"></div>
@@ -74,8 +74,8 @@
             </div>
 
             {% if result.aggregations.amount_filtered.fines.states %}
-                <h4>Zugewiesen in</h4>
-                <table class="table table-supercondensed">
+                <h4>{% trans "Allocated in" %}</h4>
+                <table class="table table-condensed">
                     <tr>
                         <td class="text-muted text-right" style="width:20%">
                             {{ result.aggregations.amount_filtered.fines.doc_count|intcomma }}
@@ -83,10 +83,10 @@
                         <td>
                             {% facet_active "state" "" as facet_is_active %}
                             {% if facet_is_active %}
-                                Alle
+                                {% trans "All" %}
                             {% else %}
                                 <a href="?{% facet_vars "state" "" %}">
-                                    Alle
+                                  {% trans "All" %}
                                 </a>
                             {% endif %}
                         </td>
@@ -116,7 +116,7 @@
                 </table>
             {% endif %}
             {% if result.aggregations.amount_filtered.fines.years %}
-                <h4>Aus dem Jahr</h4>
+                <h4>{% trans "In the year" %}</h4>
                 <table class="table table-supercondensed">
                     <tr>
                         <td class="text-muted text-right" style="width:20%">
@@ -125,10 +125,10 @@
                         <td>
                             {% facet_active "year" "" as facet_is_active %}
                             {% if facet_is_active %}
-                                Alle
+                              {% trans "All" %}
                             {% else %}
                                 <a href="?{% facet_vars "year" "" %}">
-                                    Alle
+                                  {% trans "All" %}
                                 </a>
                             {% endif %}
                         </td>
@@ -158,11 +158,7 @@
                 </table>
             {% endif %}
             <p>
-                {# Ouch, hardcoded flatpage URL #}
-                <a class="btn btn-default js-info-modal" href="/justizgelder/details/" data-target="#justizgelder-detail">
-                    <span class="glyphicon glyphicon-info-sign"></span>
-                    Infos zur Datenbank
-                </a>
+                {# Add link #}
             </p>
         </div>
         <div class="col-lg-9 col-md-8 col-sm-9">
@@ -174,8 +170,9 @@
         {% with request.get_full_path as justizgelder_search %}
 
         {% with formatted_sum=result.aggregations.amount_filtered.fines.filtered_total.total_sum.value|intcomma escaped_name=object.name|urlencode %}
-        {% with sharetext="Diese Einrichtungen haben "|add:formatted_sum|add:" € von der Justiz bekommen:"|urlencode url=SITE_URL|add:justizgelder_search %}
 
+        {% captureas sharetext %}{% blocktrans with sum=formatted_sum %}These organisations got {{ sum }} € from the judiciary: {% endblocktrans %}{% endcaptureas %}
+        {% with sharetext=sharetext|urlencode url=SITE_URL|add:justizgelder_search %}
         {% include "justizgelder/_action_area.html" with sharetext=sharetext url=url embed_url=SITE_URL|add:justizgelder_search|add_embed %}
 
         {% endwith %}
