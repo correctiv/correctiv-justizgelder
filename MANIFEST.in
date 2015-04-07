@@ -1,0 +1,6 @@
+include LICENSE
+include README.md
+recursive-include correctiv_justizgelder/locale *
+recursive-include correctiv_justizgelder/templates *
+recursive-include correctiv_justizgelder/static *
+recursive-exclude * *.pyc
