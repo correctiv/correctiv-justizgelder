@@ -8,7 +8,7 @@ from .search_utils import SearchPaginator
 
 class OrganisationSearchView(ListView):
     template_name = 'justizgelder/search.html'
-    paginate_by = 15
+    paginate_by = 25
     paginator_class = SearchPaginator
 
     def get_queryset(self):
