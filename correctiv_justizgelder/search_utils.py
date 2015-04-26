@@ -2,6 +2,7 @@ from django.utils import six
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models.query import QuerySet
 
+from .models import Fine
 
 class SearchPaginator(Paginator):
     def validate_number(self, number):
@@ -39,6 +40,9 @@ class SearchQueryset(QuerySet):
         self._total = None
         self._results = None
         self._result_cache = None
+
+        # Fake a model to make django debug toolbar happy :(
+        self.model = Fine
 
     def _fetch_all(self):
         self._results = self.index.search(
