@@ -5,7 +5,7 @@ from django.conf import settings
 from django.template.loader import render_to_string
 
 from elasticsearch import (Elasticsearch, helpers as es_helpers,
-                          exceptions as es_exceptions)
+                           exceptions as es_exceptions)
 
 from .models import Organisation
 
@@ -77,11 +77,12 @@ class SearchIndex(object):
         }
 
     def search(self, term, filters=None, size=10, offset=0, **kwargs):
+        query = self.construct_query(term, filters=filters, **kwargs)
         try:
             result = self.es.search(
                 index=self.index_name,
                 doc_type=self.name,
-                body=self.construct_query(term, filters=filters, **kwargs),
+                body=query,
                 size=size,
                 from_=offset
             )
@@ -293,7 +294,6 @@ class OrganisationIndex(SearchIndex):
                 "type": "nested",
                 "properties": {
                     'id': {'type': 'integer'},
-                    'name'
                     'amount': {'type': 'double', 'index': 'not_analyzed', 'store': True},
                     'name': {
                         "type": "multi_field",
