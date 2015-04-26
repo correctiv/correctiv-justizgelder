@@ -50,14 +50,15 @@ class SearchIndex(object):
 
     def get_documents(self):
         for obj in self.queryset.iterator():
-            yield self.make_document(obj)
+            for doc, typ in self.make_document(obj):
+                yield doc, typ
 
     def get_document_create_bulk_op(self):
-        for obj in self.get_documents():
+        for obj, typ in self.get_documents():
             obj.update({
                 '_op_type': 'create',
                 '_index': self.index_name,
-                '_type': self.name,
+                '_type': typ,
                 '_id': obj['id'],
             })
             yield obj
@@ -320,7 +321,7 @@ class OrganisationIndex(SearchIndex):
         }
 
     def make_document(self, obj):
-        return {
+        return [({
             'id': obj.pk,
             'slug': obj.slug,
             'name': obj.name,
@@ -336,4 +337,4 @@ class OrganisationIndex(SearchIndex):
                 'text': render_to_string(
                     'justizgelder/fine_search_template.txt', {'object': f})
                 } for f in obj.fines.exclude(amount=0.0)]
-        }
+        }, self.name)]
