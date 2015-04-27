@@ -6,7 +6,7 @@
 {% block object_list %}
     <p>
       {% if query %}
-        {% blocktrans with query=query hits=page_obj.paginator.count|intcomma sum=result.aggregations.amount_filtered.fines.filtered_total.total_sum.value|intcomma_floatformat:2 %}
+        {% blocktrans with query=query hits=page_obj.paginator.count|intcomma sum=result.aggregations.total_sum|intcomma_floatformat:2 %}
         “<mark>{{ query }}</mark>” resulted in
         <strong>{{ hits }} hits</strong> with a total of
         <strong>{{ sum }}&nbsp;€</strong>
@@ -28,7 +28,7 @@
 
 
       {% else %}
-        {% blocktrans with hits=page_obj.paginator.count|intcomma sum=result.aggregations.amount_filtered.fines.filtered_total.total_sum.value|intcomma_floatformat:2 %}
+        {% blocktrans with hits=page_obj.paginator.count|intcomma sum=result.aggregations.total_sum|intcomma_floatformat:2 %}
         <strong>{{ hits }} hits</strong> with a total of
         <strong>{{ sum }}&nbsp;€</strong>
         {% endblocktrans %}
@@ -42,7 +42,7 @@
                     {% trans "Name of Organisation" %}
                 </th>
                 <th class="text-right">
-                    {% trans "Total amount<br/>over all years" %}
+                    {% trans "Filtered amount" %}
                 </th>
                 {% if query %}
                     <th class="text-muted">
@@ -59,13 +59,8 @@
                     </a>
                 </td>
                 <td class="numbers" title="{% blocktrans count count=result.fines|length %}One documented entry{% plural %}{{ count }} documented entries{% endblocktrans %}">
-                    {{ result.amount|intcomma_floatformat:2 }}&nbsp;€
+                    {{ result.filtered_amount|intcomma_floatformat:2 }}&nbsp;€
                 </td>
-                {% if query %}
-                <td class="text-muted">
-                    {{ result.fines_text_highlight|safe }}
-                </td>
-                {% endif %}
             </tr>
         {% endfor %}
         </table>
