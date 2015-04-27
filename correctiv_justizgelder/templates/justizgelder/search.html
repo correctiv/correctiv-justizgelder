@@ -11,6 +11,22 @@
         <strong>{{ hits }} hits</strong> with a total of
         <strong>{{ sum }}&nbsp;€</strong>
         {% endblocktrans %}
+
+        {% facet_active "year" as year_facet %}
+        {% facet_active "state" as state_facet %}
+
+        {% if year_facet or state_facet %}
+          <br/><small>{% trans "Filters: " %}
+            {% if year_facet %}
+              {{ year_facet }}
+            {% endif %}
+            {% if state_facet %}
+              {% get_state_name state_facet %}
+            {% endif %}
+          </small>
+        {% endif %}
+
+
       {% else %}
         {% blocktrans with hits=page_obj.paginator.count|intcomma sum=result.aggregations.amount_filtered.fines.filtered_total.total_sum.value|intcomma_floatformat:2 %}
         <strong>{{ hits }} hits</strong> with a total of

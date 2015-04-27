@@ -44,11 +44,17 @@ def intcomma_floatformat(value, arg):
     return val
 
 
-def facet_active(context, name, value):
-    value = unicode(value)
+def facet_active(context, name, value=None):
     request = context['request']
     d = parse_query(urlparse(request.get_full_path()).query)
-    return d.get(name, '') == value
+
+    if value is None:
+        return d.get(name, '')
+
+    value = unicode(value)
+    if d.get(name, '') == value:
+        return True
+    return False
 
 
 def facet_vars(context, name, value):
