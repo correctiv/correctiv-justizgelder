@@ -1,4 +1,5 @@
 import logging
+import json
 from urlparse import urlparse
 
 from django.conf import settings
@@ -39,7 +40,7 @@ class SearchIndex(object):
             pass
         self.es.indices.create(self.index_name, {
             'settings': {
-                    'analysis': self.get_index_analysis()
+                'analysis': self.get_index_analysis()
             },
             'mappings': {
                 self.name: {
@@ -78,15 +79,22 @@ class SearchIndex(object):
         }
 
     def search(self, term, filters=None, size=10, offset=0, **kwargs):
+        if filters is None:
+            filters = {}
+        self.filters = filters
+        self.kwargs = kwargs
         query = self.construct_query(term, filters=filters, **kwargs)
+        print json.dumps(query, indent=4)
         try:
-            result = self.es.search(
+            raw = self.es.search(
                 index=self.index_name,
                 doc_type=self.name,
                 body=query,
                 size=size,
                 from_=offset
             )
+            print '-' * 20
+            print json.dumps(raw)
         except es_exceptions.TransportError:
             return {
                 'total': 0,
@@ -94,7 +102,7 @@ class SearchIndex(object):
                 'aggregations': {}
             }
 
-        raw_results = result['hits']['hits']
+        raw_results = raw['hits']['hits']
 
         results = []
         for r in raw_results:
@@ -104,13 +112,16 @@ class SearchIndex(object):
                 d[key + '_highlight'] = val[0]
             results.append(d)
 
-        return {
-            'total': result['hits']['total'],
+        context = {
+            'total': raw['hits']['total'],
             'results': results,
-            'aggregations': result.get('aggregations', {}),
         }
 
-    def construct_query(self, term, filters=None, **kwargs):
+        context = self.parse_result(raw, context)
+
+        return context
+
+    def construct_query(self, term, **kwargs):
         query = {
             "query": {
                 "query_string": {
@@ -120,6 +131,9 @@ class SearchIndex(object):
             }
         }
         return query
+
+    def parse_result(self, raw, context):
+        return context
 
     def get_mapping(self):
         return {}
@@ -136,11 +150,52 @@ class OrganisationIndex(SearchIndex):
     name = 'organisations'
     model = Organisation
     queryset = model._default_manager.select_related('fines')
-    aggregations = ['state']
 
     @property
     def queryset(self):
         return self.model._default_manager.exclude(sum_fines=0.0)
+
+    def parse_result(self, raw, context):
+        aggregations = raw['aggregations']
+
+        results = context['results']
+        for r in results:
+            r['filtered_amount'] = self._get_filtered_amount(r)
+
+        aggs = {
+            'doc_count': aggregations['facets']['doc_count'],
+            'max_amount': aggregations['max_amount']['value'],
+            'total_sum': aggregations['facets']['filtered']['total_sum']['value'],
+            'states': aggregations['facets']['states']['buckets'],
+            'years': aggregations['facets']['years']['buckets'],
+        }
+        context.update({
+            'aggregations': aggs,
+            'results': results
+        })
+        return context
+
+    def _get_filtered_amount(self, res):
+        return sum([f['amount'] for f in res['fines'] if self._filter_fine(f)])
+
+    def _filter_fine(self, fine):
+        for key in ('state', 'year'):
+            val = self.filters.get(key, None)
+            if val and fine[key] != val:
+                return False
+
+        ranges = self.kwargs.get('ranges')
+        if ranges:
+            for key, val in ranges.items():
+                if val is None:
+                    continue
+                k, m = key.rsplit('_', 1)
+                if m == 'gte' and not fine[k] >= val:
+                    return False
+                if m == 'lte' and not fine[k] <= val:
+                    return False
+
+        return True
 
     def construct_query(self, term, **kwargs):
         if not term:
@@ -166,46 +221,47 @@ class OrganisationIndex(SearchIndex):
 
         filters = kwargs.get('filters', {})
         filter_list = []
-        non_nested_filters = []
+        path = 'fines'
         if filters and any(filters.values()):
-            current_filters = {
-                "and": [{
-                    "term": {'fines.' + key: value}
-                } for key, value in filters.items() if value]
-            }
-            non_nested_filters.append(current_filters)
-            filter_list.append({
-                "nested": {
-                    "path": "fines",
-                    "filter": current_filters
-                }
-            })
+            filter_list.extend([{
+                "term": {'%s.%s' % (path, key): value}
+                } for key, value in filters.items() if value])
+
         ranges = kwargs.get('ranges', {})
-        range_filter = {}
         if ranges:
+            range_filter = {}
             for key, val in ranges.items():
                 if val is None:
                     continue
                 key, typ = key.rsplit('_', 1)
-                range_filter.setdefault(key, {})
-                range_filter[key][typ] = val
+                range_filter.setdefault('%s.%s' % (path, key), {})
+                range_filter['%s.%s' % (path, key)][typ] = val
             if range_filter:
                 range_filter = {"range": range_filter}
                 filter_list.append(range_filter)
-        if not range_filter:
-            range_filter = {'match_all': {}}
-        if filter_list:
-            filter_dict = {"and": filter_list}
-            query.update({
-                'post_filter': filter_dict
-            })
-        else:
-            filter_dict = {"match_all": {}}
 
-        if non_nested_filters:
-            non_nested_filters = {"and": non_nested_filters}
+        filter_dict = {}
+        if filter_list:
+            filter_dict = {
+                "filter": {
+                    "and": filter_list
+                }
+            }
         else:
-            non_nested_filters = {"match_all": {}}
+            filter_dict = {
+                "filter":  {"match_all": {}}
+            }
+
+        query.update({
+            'post_filter': {
+                'and': [{
+                    'nested': {
+                        'path': path,
+                        'filter': filter_dict['filter']
+                    }
+                }]
+            }
+        })
 
         sort = kwargs.get('sort', 'amount:desc')
         if sort:
@@ -220,52 +276,49 @@ class OrganisationIndex(SearchIndex):
             sort_list.append("_score")
             query.update({"sort": sort_list})
 
-        if kwargs.get('aggregations', True):
-            query.update({
+        aggs = {
+            "facets": {
+                "nested": {
+                    "path": path
+                },
                 "aggs": {
-                    "amount_filtered": {
-                        "filter": range_filter,
+                    "states": {
+                        "terms": {
+                            "field": "%s.state" % path,
+                            "size": 0
+                        }
+                    },
+                    "years": {
+                        "terms": {
+                            "field": "%s.year" % path,
+                            "size": 0
+                        }
+                    },
+                    "filtered": {
+                        "filter": filter_dict['filter'],
                         "aggs": {
-                            "fines": {
-                                "nested": {
-                                    "path": "fines"
-                                },
-                                "aggs": {
-                                    "states": {
-                                        "terms": {
-                                            "field": "fines.state",
-                                            "size": 0
-                                        }
-                                    },
-                                    "years": {
-                                        "terms": {
-                                            "field": "fines.year",
-                                            "size": 0
-                                        }
-                                    },
-                                    "filtered_total": {
-                                        "filter": non_nested_filters,
-                                        "aggs": {
-                                            "total_sum": {
-                                                "sum": {"field": "fines.amount"}
-                                            }
-                                        }
-                                    }
+                            "total_sum": {
+                                "sum": {
+                                    "field": "%s.amount" % path
                                 }
                             }
                         }
-                    },
-                    "max_amount": {
-                        "max": {"field": "amount"}
                     }
                 }
-            })
+            },
+            "max_amount": {
+                "max": {"field": "amount"}
+            }
+        }
+
+        query.update({"aggs": aggs})
+
         query.update({
             "highlight": {
                 "pre_tags": ["<mark>"],
                 "post_tags": ["</mark>"],
                 "fields": {
-                    "fines.text": {}
+                    "%s.text" % path: {}
                 }
             }
         })
