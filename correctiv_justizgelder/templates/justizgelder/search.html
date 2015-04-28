@@ -6,7 +6,7 @@
 {% block object_list %}
     <p>
       {% if query %}
-        {% blocktrans with query=query hits=page_obj.paginator.count|intcomma sum=result.aggregations.total_sum|intcomma_floatformat:2 %}
+        {% blocktrans with query=query hits=page_obj.paginator.count|intcomma sum=aggregates.total_sum|intcomma_floatformat:2 %}
         “<mark>{{ query }}</mark>” resulted in
         <strong>{{ hits }} hits</strong> with a total of
         <strong>{{ sum }}&nbsp;€</strong>
@@ -28,7 +28,7 @@
 
 
       {% else %}
-        {% blocktrans with hits=page_obj.paginator.count|intcomma sum=result.aggregations.total_sum|intcomma_floatformat:2 %}
+        {% blocktrans with hits=page_obj.paginator.count|intcomma sum=aggregates.total_sum|intcomma_floatformat:2 %}
         <strong>{{ hits }} hits</strong> with a total of
         <strong>{{ sum }}&nbsp;€</strong>
         {% endblocktrans %}
@@ -38,29 +38,25 @@
         <table class="table">
           <thead>
             <tr>
-                <th>
-                    {% trans "Name of Organisation" %}
-                </th>
-                <th class="text-right">
-                    {% trans "Filtered amount" %}
-                </th>
-                {% if query %}
-                    <th class="text-muted">
-                    </th>
-              {% endif %}
+              <th>
+                  {% trans "Name of Organisation" %}
+              </th>
+              <th class="text-right">
+                  {% trans "Filtered amount" %}
+              </th>
             </tr>
           </thead>
           <tbody>
         {% for result in object_list %}
             <tr>
-                <td>
-                    <a href="{% url 'justizgelder:organisation_detail' slug=result.slug %}">
-                        {{ result.name }}
-                    </a>
-                </td>
-                <td class="numbers" title="{% blocktrans count count=result.fines|length %}One documented entry{% plural %}{{ count }} documented entries{% endblocktrans %}">
-                    {{ result.filtered_amount|intcomma_floatformat:2 }}&nbsp;€
-                </td>
+              <td>
+                  <a href="{% url 'justizgelder:organisation_detail' slug=result.slug %}">
+                      {{ result.name }}
+                  </a>
+              </td>
+              <td class="numbers" title="{% blocktrans count count=result.fine_count %}One documented entry{% plural %}{{ count }} documented entries{% endblocktrans %}">
+                  {{ result.filtered_amount|intcomma_floatformat:2 }}&nbsp;€
+              </td>
             </tr>
         {% endfor %}
         </table>

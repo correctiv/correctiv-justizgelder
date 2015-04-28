@@ -43,12 +43,13 @@
                 </div><!-- /input-group -->
                 <div class="pull-right">
                     <p>
-                    {% trans "Sort by:" %}
-                    {% for radio in form.sort %}
+                      {% trans "Sort by:" %}
+                      {% for radio in form.sort %}
                         <label class="radio-inline">
                             {{ radio }}
                         </label>
-                    {% endfor %}
+                      {% endfor %}
+                      {{ form.treasury }}
                     </p>
                 </div>
             </form>
@@ -56,7 +57,6 @@
     </div>
     <div class="row">
         <div class="col-lg-3 col-md-4 col-sm-3">
-          {% comment %}
             <h4>{% trans "Set range of single amount" %}</h4>
             <div class="row">
                 <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 col-xs-offset-1">
@@ -67,20 +67,19 @@
                         </div>
                         <div class="col-xs-6">
                             <p class="text-right text-muted" id="amount_lte_label">
-                                {{ result.aggregations.max_amount|floatformat:0 }}
+                                {{ aggregates.max_amount|floatformat:0 }}
                             </p>
                         </div>
                     </div>
                 </div>
             </div>
-            {% endcomment %}
-            {% if result.aggregations.states %}
-              {% with states=result.aggregations.states %}
+            {% if aggregates.states %}
+              {% with states=aggregates.states %}
                 <h4>{% trans "Allocated in" %}</h4>
                 <table class="table table-condensed">
                     <tr>
                         <td class="text-muted text-right" style="width:20%">
-                            {{ result.aggregations.doc_count|intcomma }}
+                            {{ aggregates.doc_count|intcomma }}
                         </td>
                         <td>
                             {% facet_active "state" "" as facet_is_active %}
@@ -93,22 +92,22 @@
                             {% endif %}
                         </td>
                     </tr>
-                {% for facet in states|dictsort:"key" %}
+                {% for facet in states|dictsort:"state" %}
                     {% if facet.doc_count %}
                         <tr>
                             <td class="text-muted text-right">
                                 {{ facet.doc_count|intcomma }}
                             </td>
                             <td>
-                                {% facet_active "state" facet.key as facet_is_active %}
+                                {% facet_active "state" facet.state as facet_is_active %}
                                 {% if facet_is_active %}
-                                    {% get_state_name facet.key %}
-                                    <a href="?{% facet_vars "state" facet.key %}">
+                                    {% get_state_name facet.state %}
+                                    <a href="?{% facet_vars "state" facet.state %}">
                                         <span class="glyphicon glyphicon-remove"></span>
                                     </a>
                                 {% else %}
-                                    <a href="?{% facet_vars "state" facet.key %}">
-                                        {% get_state_name facet.key %}
+                                    <a href="?{% facet_vars "state" facet.state %}">
+                                        {% get_state_name facet.state %}
                                     </a>
                                 {% endif %}
                             </td>
@@ -118,13 +117,13 @@
                 </table>
               {% endwith %}
             {% endif %}
-            {% if result.aggregations.years %}
-              {% with years=result.aggregations.years %}
+            {% if aggregates.years %}
+              {% with years=aggregates.years %}
                 <h4>{% trans "In the year" %}</h4>
                 <table class="table table-supercondensed">
                     <tr>
                         <td class="text-muted text-right" style="width:20%">
-                            {{ result.aggregations.doc_count|intcomma }}
+                            {{ aggregates.doc_count|intcomma }}
                         </td>
                         <td>
                             {% facet_active "year" "" as facet_is_active %}
@@ -137,22 +136,22 @@
                             {% endif %}
                         </td>
                     </tr>
-                {% for facet in years|dictsort:"key" %}
+                {% for facet in years|dictsort:"year" %}
                     {% if facet.doc_count %}
                         <tr>
                             <td class="text-muted text-right">
                                 {{ facet.doc_count|intcomma }}
                             </td>
                             <td class="text-left">
-                                {% facet_active "year" facet.key as facet_is_active %}
+                                {% facet_active "year" facet.year as facet_is_active %}
                                 {% if facet_is_active %}
-                                    {{ facet.key }}
-                                    <a href="?{% facet_vars "year" facet.key %}">
+                                    {{ facet.year }}
+                                    <a href="?{% facet_vars "year" facet.year %}">
                                         <span class="glyphicon glyphicon-remove"></span>
                                     </a>
                                 {% else %}
-                                    <a href="?{% facet_vars "year" facet.key %}">
-                                        {{ facet.key }}
+                                    <a href="?{% facet_vars "year" facet.year %}">
+                                        {{ facet.year }}
                                     </a>
                                 {% endif %}
                             </td>
@@ -174,7 +173,7 @@
     <hr/>
         {% with request.get_full_path as justizgelder_search %}
 
-        {% with formatted_sum=result.aggregations.amount_filtered.fines.filtered_total.total_sum.value|intcomma escaped_name=object.name|urlencode %}
+        {% with formatted_sum=aggregates.total_sum|intcomma escaped_name=object.name|urlencode %}
 
         {% captureas sharetext %}{% blocktrans with sum=formatted_sum %}These organisations got {{ sum }} € from the judiciary: {% endblocktrans %}{% endcaptureas %}
         {% with sharetext=sharetext|urlencode url=SITE_URL|add:justizgelder_search %}
@@ -190,7 +189,7 @@
     <script src="{% static "justizgelder/js/jquery.nouislider.min.js" %}"></script>
     <script>
     (function(){
-        var max_value = {{ result.aggregations.max_amount|floatformat:0 }} + 1000;
+        var max_value = {{ aggregates.max_amount|floatformat:0 }} + 1000;
         if ($('#id_amount_gte').val() === '') {
             $('#id_amount_gte').val("0");
         }

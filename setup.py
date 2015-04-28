@@ -34,8 +34,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         'Django<1.8',
-        'pyelasticsearch',
-        'elasticsearch',
+        'djorm-ext-pgfulltext>=0.9.3'
         'unicode-slugify',
     ],
     include_package_data=True,

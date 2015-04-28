@@ -1,7 +1,11 @@
 # -*- encoding: utf-8 -*-
 from django.db import models
+from django.db.models import Sum, Count, Max
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
+
+from djorm_pgfulltext.models import SearchManager
+from djorm_pgfulltext.fields import VectorField
 
 
 GERMAN_STATES = (
@@ -25,20 +29,69 @@ GERMAN_STATES = (
 GERMAN_STATES_DICT = dict(GERMAN_STATES)
 
 
+class OrganisationManager(models.Manager):
+    def search(self, query=None, **kwargs):
+
+        filters = {}
+        fine_filter = {}
+        if query:
+            query = query.strip().encode('utf-8').split()
+            fine_filter['search_index__ft_startswith'] = query
+            filters['fines__search_index__ft_startswith'] = query
+
+        sort = kwargs.pop('sort')
+        if sort == 'name:asc':
+            ordering = 'name'
+        else:
+            ordering = '-filtered_amount'
+
+        for key, val in kwargs.items():
+            if val:
+                filters['fines__%s' % key] = val
+
+        q = (
+            Organisation.objects.all()
+            .filter(**filters)
+            .annotate(
+                filtered_amount=Sum('fines__amount'),
+                fine_count=Count('fines')
+            )
+            .order_by(ordering)
+        )
+
+        fines = Fine.objects.filter(**fine_filter)
+
+        aggs = {
+            'total_sum': q.aggregate(
+                total_sum=Sum('filtered_amount'))['total_sum'] or 0.0,
+            'max_amount': q.aggregate(
+                max_amount=Max('filtered_amount'))['max_amount'] or 0.0,
+            'years': fines.values('year').annotate(
+                doc_count=Count('year')).order_by(),
+            'states': fines.values('state').annotate(
+                doc_count=Count('state')).order_by(),
+            'doc_count': fines.count()
+        }
+        return q, aggs
+
+
 class Organisation(models.Model):
     name = models.CharField(max_length=512)
     slug = models.SlugField(max_length=255)
     sum_fines = models.DecimalField(null=True, decimal_places=2, max_digits=19)
     note = models.TextField(blank=True)
 
+    objects = OrganisationManager()
+
     def __unicode__(self):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('justizgelder:organisation_detail', kwargs={'slug': self.slug})
+        return reverse('justizgelder:organisation_detail',
+                       kwargs={'slug': self.slug})
 
 
-class FineManager(models.Manager):
+class FineManager(SearchManager):
     def all_with_amount(self):
         return self.get_queryset().exclude(amount=0.0)
 
@@ -80,6 +133,21 @@ class Fine(models.Model):
 
     city = models.CharField(max_length=255, blank=True)
     postcode = models.CharField(max_length=10, blank=True)
+
+    search_index = VectorField()
+
+    objects = FineManager(
+        fields=[
+            ('name', 'A'),
+            ('city', 'B'),
+            ('postcode', 'C'),
+            ('address', 'D'),
+            ('department_detail', 'D'),
+        ],
+        config='pg_catalog.german',
+        search_field='search_index',
+        auto_update_search_field=True
+    )
 
     objects = FineManager()
 

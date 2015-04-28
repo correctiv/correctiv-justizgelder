@@ -1,15 +1,13 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from .search_indexes import OrganisationIndex
-from .search_utils import SearchQueryset
-from .models import GERMAN_STATES
+from .models import Organisation, GERMAN_STATES
 
 
 class OrganisationSearchForm(forms.Form):
     q = forms.CharField(
         required=False,
-        label='Suche',
+        label=_('Search'),
         widget=forms.TextInput(
             attrs={
                 'type': 'search',
@@ -30,6 +28,18 @@ class OrganisationSearchForm(forms.Form):
         required=False,
         widget=forms.HiddenInput)
 
+    treasury = forms.TypedChoiceField(
+        label=_('Include treasury'),
+        choices=[
+            ('', 'Include treasury'),
+            ('0', _('Exclude treasury')),
+            ('1', _('Only treasury')),
+        ],
+        empty_value=None,
+        required=False,
+        coerce=lambda x: bool(int(x))
+    )
+
     year = forms.TypedChoiceField(
         choices=(
             (2007, '2007'),
@@ -48,9 +58,8 @@ class OrganisationSearchForm(forms.Form):
 
     sort = forms.ChoiceField(
         choices=(
-            # ('name:asc', _('Name')),
             ('amount:desc', _('Amount')),
-            ('', _('Relevance'))
+            ('name:asc', _('Name')),
         ),
         initial='amount:desc',
         required=False,
@@ -70,18 +79,16 @@ class OrganisationSearchForm(forms.Form):
         data.setdefault('sort', 'amount:desc')
         super(OrganisationSearchForm, self).__init__(data=data, **kwargs)
 
-    def _search(self, idx, size, query):
-        return SearchQueryset(
-            idx,
-            query,
-            filters=self.get_filters(),
-            ranges=self.get_ranges(),
-            sort=self.cleaned_data.get('sort', ''),
-            size=size
+    def _search(self, query):
+        return Organisation.objects.search(
+            query=self.cleaned_data.get('q'),
+            sort=self.cleaned_data.get('sort'),
+            state=self.cleaned_data.get('state'),
+            year=self.cleaned_data.get('year'),
+            treasury=self.cleaned_data.get('treasury'),
+            amount__gte=self.cleaned_data.get('amount__gte'),
+            amount__lte=self.cleaned_data.get('amount__lte')
         )
-
-    def no_query_found(self, idx, size):
-        return self._search(idx, size, '')
 
     def get_filters(self):
         filters = {}
@@ -92,14 +99,12 @@ class OrganisationSearchForm(forms.Form):
     def get_ranges(self):
         return {key: self.cleaned_data[key] for key in self.RANGES}
 
-    def search(self, size=None):
-        idx = OrganisationIndex()
+    def search(self):
         if not self.is_valid():
-            return SearchQueryset(idx, '')
+            import ipdb; ipdb.set_trace()
 
-        if not self.cleaned_data.get('q'):
-            return self.no_query_found(idx, size)
+            return Organisation.objects.all(), {}
 
-        sqs = self._search(idx, size, self.cleaned_data['q'])
+        sqs = self._search(self.cleaned_data['q'])
 
         return sqs
