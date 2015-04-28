@@ -72,7 +72,10 @@ class Command(BaseCommand):
         parts = row['path'].split('/')
         fine.state = parts[1]
         fine.year = int(parts[2])
-        fine.department = parts[3]
+        if parts[3] not in Fine.DEPARTMENTS_DICT:
+            fine.department = ''
+        else:
+            fine.department = parts[3]
         fine.department_detail = parts[4].split('_')[0].title()
         fine.amount = decimal.Decimal(row['betrag'])
         if row.get('betrag_eingegangen'):
