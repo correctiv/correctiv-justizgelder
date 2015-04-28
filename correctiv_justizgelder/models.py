@@ -80,6 +80,7 @@ class Organisation(models.Model):
     slug = models.SlugField(max_length=255)
     sum_fines = models.DecimalField(null=True, decimal_places=2, max_digits=19)
     note = models.TextField(blank=True)
+    treasury = models.BooleanField(default=False)
 
     objects = OrganisationManager()
 
@@ -133,6 +134,8 @@ class Fine(models.Model):
 
     city = models.CharField(max_length=255, blank=True)
     postcode = models.CharField(max_length=10, blank=True)
+
+    treasury = models.BooleanField(default=False)
 
     search_index = VectorField()
 

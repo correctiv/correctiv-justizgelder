@@ -20,6 +20,11 @@ class Command(BaseCommand):
 
         filename = args[0]
 
+        self.staatskasse = Organisation.objects.get_or_create(
+            name='Staatskasse', slug='staatskasse',
+            treasury=True
+        )
+
         collection = []
         for fine in self.get_fine_objects(filename):
             collection.append(fine)
@@ -48,11 +53,18 @@ class Command(BaseCommand):
 
         org_slug = slugify(row['name'])
 
-        try:
-            org = Organisation.objects.get(slug=org_slug)
-        except Organisation.DoesNotExist:
-            org = Organisation.objects.create(name=row['name'], slug=org_slug)
+        treasury = False
 
+        if bool(int(row.get('staatkasse', '0'))):
+            org = self.staatskasse
+            treasury = True
+        else:
+            try:
+                org = Organisation.objects.get(slug=org_slug)
+            except Organisation.DoesNotExist:
+                org = Organisation.objects.create(name=row['name'], slug=org_slug)
+
+        fine.treasury = treasury
         fine.organisation = org
         fine.name = row['name']
         fine.original_name = row['orig_name']
@@ -61,9 +73,9 @@ class Command(BaseCommand):
         fine.state = parts[1]
         fine.year = int(parts[2])
         fine.department = parts[3]
-        fine.department_detail = parts[4].split('_')[1].title()
+        fine.department_detail = parts[4].split('_')[0].title()
         fine.amount = decimal.Decimal(row['betrag'])
-        if row['betrag_eingegangen']:
+        if row.get('betrag_eingegangen'):
             fine.amount_received = decimal.Decimal(row['betrag_eingegangen'])
 
         fine.address = row['adresse']
