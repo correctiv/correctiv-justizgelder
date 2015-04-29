@@ -175,5 +175,5 @@ class Fine(models.Model):
         if self.source_file:
             if not self.source_file.rsplit('.', 1)[0].endswith('_'):
                 # File is not 'secret'
-                return 'justizgelder/' + self.source_file
+                return 'investigations/justizgelder/' + self.source_file
         return ''
