@@ -15,7 +15,7 @@ GERMAN_STATES = (
     ('brandenburg', _(u'Brandenburg')),
     ('bremen', _(u'Bremen')),
     ('hamburg', _(u'Hamburg')),
-    ('hessen', (u'Hesse')),
+    ('hessen', _(u'Hesse')),
     ('mecklenburg-vorpommern', _(u'Mecklenburg-Western Pomerania')),
     ('niedersachsen', _(u'Lower Saxony')),
     ('nordrhein-westfalen', _(u'North Rhine-Westphalia')),
