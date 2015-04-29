@@ -90,19 +90,8 @@ class OrganisationSearchForm(forms.Form):
             amount__lte=self.cleaned_data.get('amount__lte')
         )
 
-    def get_filters(self):
-        filters = {}
-        for key in self.FILTERS:
-            filters[self.FILTERS[key]] = self.cleaned_data[key]
-        return filters
-
-    def get_ranges(self):
-        return {key: self.cleaned_data[key] for key in self.RANGES}
-
     def search(self):
         if not self.is_valid():
-            import ipdb; ipdb.set_trace()
-
             return Organisation.objects.all(), {}
 
         sqs = self._search(self.cleaned_data['q'])
