@@ -7,7 +7,7 @@ class Command(BaseCommand):
     help = "Print all source files"
 
     def handle(self, *args, **options):
-        qs = Fine.objects.all().values_list('source_file', flat=True)
+        qs = Fine.objects.filter(year__gte=2011, year__lte=2013).values_list('source_file', flat=True)
         for filename in set(qs.iterator()):
             if filename.rsplit('.', 1)[0].endswith('_'):
                 continue
