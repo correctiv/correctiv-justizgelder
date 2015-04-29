@@ -39,14 +39,10 @@ class OrganisationManager(models.Manager):
             fine_filter['search_index__ft_startswith'] = query
             filters['fines__search_index__ft_startswith'] = query
 
-        sort = kwargs.pop('sort')
-        if sort == 'name:asc':
-            ordering = 'name'
-        else:
-            ordering = '-filtered_amount'
+        ordering = '-filtered_amount'
 
         for key, val in kwargs.items():
-            if val:
+            if val is not None and val != '':
                 filters['fines__%s' % key] = val
 
         q = (
