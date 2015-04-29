@@ -66,8 +66,8 @@ class OrganisationSearchForm(forms.Form):
             state=self.cleaned_data.get('state'),
             year=self.cleaned_data.get('year'),
             treasury=self.cleaned_data.get('treasury'),
-            amount__gte=self.cleaned_data.get('amount__gte'),
-            amount__lte=self.cleaned_data.get('amount__lte')
+            amount__gte=self.cleaned_data.get('amount_gte'),
+            amount__lte=self.cleaned_data.get('amount_lte')
         )
 
     def search(self):
