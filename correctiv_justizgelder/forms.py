@@ -32,12 +32,13 @@ class OrganisationSearchForm(forms.Form):
         label=_('Include treasury'),
         choices=[
             ('0', _('Exclude treasury')),
-            ('', 'Include treasury'),
+            ('-', _('Include treasury')),
             ('1', _('Only treasury')),
         ],
+        initial=False,
         empty_value=None,
         required=False,
-        coerce=lambda x: bool(int(x))
+        coerce=lambda x: None if x == '-' else bool(int(x))
     )
 
     year = forms.TypedChoiceField(
