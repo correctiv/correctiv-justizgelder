@@ -56,33 +56,13 @@ class OrganisationSearchForm(forms.Form):
         empty_value='',
         widget=forms.HiddenInput)
 
-    sort = forms.ChoiceField(
-        choices=(
-            ('amount:desc', _('Amount')),
-            ('name:asc', _('Name')),
-        ),
-        initial='amount:desc',
-        required=False,
-        widget=forms.RadioSelect)
-
-    FILTERS = {
-        'state': 'state',
-        'year': 'year'
-    }
-    RANGES = (
-        'amount_lte',
-        'amount_gte'
-    )
-
     def __init__(self, data, **kwargs):
         data = data.copy()
-        data.setdefault('sort', 'amount:desc')
         super(OrganisationSearchForm, self).__init__(data=data, **kwargs)
 
     def _search(self, query):
         return Organisation.objects.search(
             query=self.cleaned_data.get('q'),
-            sort=self.cleaned_data.get('sort'),
             state=self.cleaned_data.get('state'),
             year=self.cleaned_data.get('year'),
             treasury=self.cleaned_data.get('treasury'),

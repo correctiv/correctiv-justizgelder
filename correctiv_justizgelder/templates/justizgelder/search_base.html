@@ -43,12 +43,6 @@
                 </div><!-- /input-group -->
                 <div class="pull-right">
                     <p>
-                      {% trans "Sort by:" %}
-                      {% for radio in form.sort %}
-                        <label class="radio-inline">
-                            {{ radio }}
-                        </label>
-                      {% endfor %}
                       {{ form.treasury }}
                     </p>
                 </div>
@@ -224,6 +218,9 @@
             $('#amount_lte_label').text(val[1] + ' T€');
         }).trigger('slide');
         $('.radio-inline').click(function(){
+            $(this).parents('form').submit();
+        });
+        $('#id_treasury').change(function(){
             $(this).parents('form').submit();
         });
         $('.js-info-modal').click(function(e){
