@@ -20,7 +20,7 @@ class Command(BaseCommand):
 
         filename = args[0]
 
-        self.staatskasse = Organisation.objects.get_or_create(
+        self.staatskasse, created = Organisation.objects.get_or_create(
             name='Staatskasse', slug='staatskasse',
             treasury=True
         )
@@ -55,7 +55,7 @@ class Command(BaseCommand):
 
         treasury = False
 
-        if bool(int(row.get('staatkasse', '0'))):
+        if bool(int(row.get('staatskasse', '0'))):
             org = self.staatskasse
             treasury = True
         else:
