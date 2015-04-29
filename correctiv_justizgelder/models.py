@@ -72,7 +72,7 @@ class OrganisationManager(models.Manager):
 
 
 class Organisation(models.Model):
-    name = models.CharField(max_length=512)
+    name = models.CharField(max_length=512, db_index=True)
     slug = models.SlugField(max_length=255)
     sum_fines = models.DecimalField(null=True, decimal_places=2, max_digits=19)
     note = models.TextField(blank=True)
@@ -108,9 +108,9 @@ class Fine(models.Model):
     name = models.CharField(max_length=512)
     original_name = models.CharField(max_length=512)
 
-    year = models.SmallIntegerField()
+    year = models.SmallIntegerField(db_index=True)
 
-    state = models.CharField(max_length=25, choices=GERMAN_STATES)
+    state = models.CharField(max_length=25, choices=GERMAN_STATES, db_index=True)
     department = models.CharField(max_length=10, choices=DEPARTMENTS)
     department_detail = models.CharField(max_length=255, blank=True)
 
@@ -131,7 +131,7 @@ class Fine(models.Model):
     city = models.CharField(max_length=255, blank=True)
     postcode = models.CharField(max_length=10, blank=True)
 
-    treasury = models.BooleanField(default=False)
+    treasury = models.BooleanField(default=False, db_index=True)
 
     search_index = VectorField()
 
