@@ -31,14 +31,13 @@ class OrganisationSearchForm(forms.Form):
     treasury = forms.TypedChoiceField(
         label=_('Include treasury'),
         choices=[
-            ('0', _('Exclude treasury')),
-            ('-', _('Include treasury')),
-            ('1', _('Only treasury')),
+            ('', _('Exclude treasury')),
+            ('1', _('Include treasury')),
         ],
-        initial=False,
-        empty_value=None,
+        initial='',
+        empty_value=False,
         required=False,
-        coerce=lambda x: None if x == '-' else bool(int(x))
+        coerce=lambda x: None
     )
 
     year = forms.TypedChoiceField(
