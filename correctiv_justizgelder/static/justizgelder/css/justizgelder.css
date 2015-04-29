@@ -1,0 +1,32 @@
+.justizgelder {
+  font-size: 16px;
+}
+
+.justizgelder h2 {
+  font-size: 26px;
+  font-weight: bold;
+  padding: 10px 0;
+}
+
+.justizgelder h4 {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.justizgelder .table-condensed td {
+  border: 0;
+  padding: 0 5px;
+}
+
+.justizgelder .sidebar {
+  padding-top: 40px;
+}
+
+.justizgelder .amount-range {
+  margin-top: 10px;
+  margin-left: -10px;
+}
+
+.justizgelder .treasury-selection {
+  margin-top: 10px;
+}

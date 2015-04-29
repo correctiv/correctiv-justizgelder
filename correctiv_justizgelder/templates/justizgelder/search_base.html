@@ -8,6 +8,7 @@
 {% block extra_style %}
     {{ block.super }}
     <link rel="stylesheet" href="{% static "justizgelder/css/jquery.nouislider.css" %}"/>
+    <link rel="stylesheet" href="{% static "justizgelder/css/justizgelder.css" %}"/>
     <style type="text/css">
     .noUi-connect {
       background: #428bca;
@@ -24,7 +25,9 @@
 {% endblock %}
 
 {% block content %}
+<div class="justizgelder">
     {% facet_vars "" "getvars" %}
+
     <div class="row">
         <div class="col-lg-9 col-md-8 col-sm-12">
             <h2>{% trans "Search for recipients" %}</h2>
@@ -39,7 +42,7 @@
                         <button class="btn btn-default" type="submit">{% trans "Search" %}</button>
                     </span>
                 </div><!-- /input-group -->
-                <div class="pull-right">
+                <div class="pull-right treasury-selection">
                     <p>
                       {{ form.treasury }}
                     </p>
@@ -51,11 +54,11 @@
         <div class="col-lg-9 col-md-8 col-sm-9">
             {% block object_list %}{% endblock %}
         </div>
-        <div class="col-lg-3 col-md-4 col-sm-3">
+        <div class="sidebar col-lg-3 col-md-4 col-sm-3">
             <h4>{% trans "Set range of total amount" %}</h4>
             <div class="row">
                 <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 col-xs-offset-1">
-                    <div id="amount-range"></div>
+                    <div id="amount-range" class="amount-range"></div>
                     <div class="row">
                         <div class="col-lg-6 col-xs-6">
                             <p class="text-left text-muted" id="amount_gte_label">0</p>
@@ -115,7 +118,7 @@
             {% if aggregates.years %}
               {% with years=aggregates.years %}
                 <h4>{% trans "In the year" %}</h4>
-                <table class="table table-supercondensed">
+                <table class="table table-condensed">
                     <tr>
                         <td class="text-muted text-right" style="width:20%">
                             {{ aggregates.doc_count|intcomma }}
@@ -171,6 +174,7 @@
         {% endwith %}
         {% endwith %}
         {% endwith %}
+</div>
 {% endblock %}
 
 {% block scripts %}
