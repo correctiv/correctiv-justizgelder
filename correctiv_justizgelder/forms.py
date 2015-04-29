@@ -31,8 +31,8 @@ class OrganisationSearchForm(forms.Form):
     treasury = forms.TypedChoiceField(
         label=_('Include treasury'),
         choices=[
-            ('', 'Include treasury'),
             ('0', _('Exclude treasury')),
+            ('', 'Include treasury'),
             ('1', _('Only treasury')),
         ],
         empty_value=None,
