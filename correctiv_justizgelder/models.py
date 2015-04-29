@@ -39,29 +39,34 @@ class OrganisationManager(models.Manager):
             fine_filter['search_index__ft_startswith'] = query
             filters['fines__search_index__ft_startswith'] = query
 
-        ordering = '-filtered_amount'
-
         for key, val in kwargs.items():
             if val is not None and val != '':
                 filters['fines__%s' % key] = val
 
-        q = (
-            Organisation.objects.all()
-            .filter(**filters)
-            .annotate(
+        q = Organisation.objects.filter(**filters)
+
+        if len(filters):
+            amount_col = 'filtered_amount'
+            q = q.annotate(
                 filtered_amount=Sum('fines__amount'),
                 fine_count=Count('fines')
             )
-            .order_by(ordering)
-        )
+        else:
+            amount_col = 'sum_fines'
+            q = q.annotate(
+                fine_count=Count('fines')
+            )
+
+        ordering = '-%s' % amount_col
+        q = q.order_by(ordering)
 
         fines = Fine.objects.filter(**fine_filter)
 
         aggs = {
             'total_sum': q.aggregate(
-                total_sum=Sum('filtered_amount'))['total_sum'] or 0.0,
+                total_sum=Sum(amount_col))['total_sum'] or 0.0,
             'max_amount': q.aggregate(
-                max_amount=Max('filtered_amount'))['max_amount'] or 0.0,
+                max_amount=Max(amount_col))['max_amount'] or 0.0,
             'years': fines.values('year').annotate(
                 doc_count=Count('year')).order_by(),
             'states': fines.values('state').annotate(
@@ -86,6 +91,10 @@ class Organisation(models.Model):
     def get_absolute_url(self):
         return reverse('justizgelder:organisation_detail',
                        kwargs={'slug': self.slug})
+
+    @property
+    def amount(self):
+        return getattr(self, 'filtered_amount', self.sum_fines)
 
 
 class FineManager(SearchManager):

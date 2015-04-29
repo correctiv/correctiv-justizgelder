@@ -55,7 +55,7 @@
                   </a>
               </td>
               <td class="numbers" title="{% blocktrans count count=result.fine_count %}One documented entry{% plural %}{{ count }} documented entries{% endblocktrans %}">
-                  {{ result.filtered_amount|intcomma_floatformat:2 }}&nbsp;€
+                  {{ result.amount|intcomma_floatformat:2 }}&nbsp;€
               </td>
             </tr>
         {% endfor %}
