@@ -26,8 +26,6 @@
 {% block content %}
     {% facet_vars "" "getvars" %}
     <div class="row">
-        <div class="col-lg-3 col-md-4 col-sm-12">
-        </div>
         <div class="col-lg-9 col-md-8 col-sm-12">
             <h2>{% trans "Search for recipients" %}</h2>
             <form method="get" action="?{{ getvars }}">
@@ -50,6 +48,9 @@
         </div>
     </div>
     <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-9">
+            {% block object_list %}{% endblock %}
+        </div>
         <div class="col-lg-3 col-md-4 col-sm-3">
             <h4>{% trans "Set range of single amount" %}</h4>
             <div class="row">
@@ -155,12 +156,6 @@
                 </table>
               {% endwith %}
             {% endif %}
-            <p>
-                {# Add link #}
-            </p>
-        </div>
-        <div class="col-lg-9 col-md-8 col-sm-9">
-            {% block object_list %}{% endblock %}
         </div>
     </div>
 
