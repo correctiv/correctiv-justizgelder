@@ -12,7 +12,7 @@ class OrganisationSearchForm(forms.Form):
             attrs={
                 'type': 'search',
                 'class': 'form-control',
-                'placeholder': _('Your search')
+                'placeholder': _('e.g. Polizeisport')
             }))
 
     amount_gte = forms.IntegerField(
