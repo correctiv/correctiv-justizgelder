@@ -19,9 +19,6 @@ def parse_query(query_string):
     return QueryDict(query_string.encode('ascii', 'ignore'), mutable=True)
 
 
-DECIMAL_SEPARATOR = floatformat(0.0, 2)[1]
-
-
 def add_embed(url):
     (scheme, netloc, path, query, fragment) = urlsplit(url)
     d = parse_query(query)
@@ -31,6 +28,8 @@ def add_embed(url):
 
 
 def intcomma_floatformat(value, arg):
+    DECIMAL_SEPARATOR = floatformat(0.0, 2)[1]
+
     val = intcomma(value)
     if DECIMAL_SEPARATOR not in val:
         val += '%s00' % DECIMAL_SEPARATOR
