@@ -37,7 +37,7 @@ class Command(BaseCommand):
         self.create_aggregates()
 
     def get_fine_objects(self, filename):
-        for row in unicodecsv.DictReader(file(filename)):
+        for row in unicodecsv.DictReader(open(filename)):
             fine = None
             try:
                 fine = Fine.objects.get(
@@ -51,7 +51,11 @@ class Command(BaseCommand):
         if fine is None:
             fine = Fine()
 
-        org_slug = slugify(row['name'])
+        org_slug = slugify(row['name'], only_ascii=True)
+        old_org_slug = slugify(row['name'])
+
+        if org_slug != old_org_slug:
+            Organisation.objects.filter(slug=old_org_slug).delete()
 
         treasury = False
 
@@ -76,7 +80,12 @@ class Command(BaseCommand):
             fine.department = ''
         else:
             fine.department = parts[3]
-        fine.department_detail = parts[4].split('_')[0].title()
+        department_detail = parts[4].split('_')
+        if len(department_detail) > 3:
+            department_detail = department_detail[3].title()
+            if department_detail != str(fine.year):
+                fine.department_detail = department_detail
+
         fine.amount = decimal.Decimal(row['betrag'])
         if row.get('betrag_eingegangen'):
             fine.amount_received = decimal.Decimal(row['betrag_eingegangen'])

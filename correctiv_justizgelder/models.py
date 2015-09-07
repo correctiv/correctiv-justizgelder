@@ -185,7 +185,10 @@ class Fine(models.Model):
 
     @property
     def department_label(self):
-        return self.DEPARTMENTS_DICT[self.department] + ' ' + self.department_detail
+        if self.department_detail:
+            return u'%s %s' % (self.DEPARTMENTS_DICT[self.department], self.department_detail)
+        else:
+            return self.DEPARTMENTS_DICT[self.department]
 
     @property
     def source_file_extension(self):
