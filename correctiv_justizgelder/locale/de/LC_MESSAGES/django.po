@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-04-29 12:54+0200\n"
-"PO-Revision-Date: 2015-04-29 12:55+0100\n"
+"POT-Creation-Date: 2015-09-07 18:08+0200\n"
+"PO-Revision-Date: 2015-09-07 18:09+0100\n"
 "Last-Translator: Stefan Wehrmeyer <stefan.wehrmeyer@okfn.org>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -22,7 +22,7 @@ msgstr ""
 msgid "Court Donations Database"
 msgstr "Justizgelder-Datenbank"
 
-#: forms.py:10 templates/justizgelder/search_base.html:39
+#: forms.py:10 templates/justizgelder/search_base.html:42
 msgid "Search"
 msgstr "Suchen"
 
@@ -273,37 +273,37 @@ msgstr "Keine Ergebnisse gefunden"
 msgid "Judiciary donations search"
 msgstr "Suche nach Zuwendungen der Justiz"
 
-#: templates/justizgelder/search_base.html:30
+#: templates/justizgelder/search_base.html:33
 msgid "Search for recipients"
 msgstr "Suche nach Zuwendungsempfängern"
 
-#: templates/justizgelder/search_base.html:55
+#: templates/justizgelder/search_base.html:58
 msgid "Set range of total amount"
 msgstr "Gesamtbetrag einschränken"
 
-#: templates/justizgelder/search_base.html:73
+#: templates/justizgelder/search_base.html:76
 msgid "Allocated in"
 msgstr "Zugewiesen in"
 
-#: templates/justizgelder/search_base.html:82
 #: templates/justizgelder/search_base.html:85
-#: templates/justizgelder/search_base.html:126
+#: templates/justizgelder/search_base.html:88
 #: templates/justizgelder/search_base.html:129
+#: templates/justizgelder/search_base.html:132
 msgid "All"
 msgstr "Alle"
 
-#: templates/justizgelder/search_base.html:117
+#: templates/justizgelder/search_base.html:120
 msgid "In the year"
 msgstr "Im Jahr"
 
-#: templates/justizgelder/search_base.html:167
+#: templates/justizgelder/search_base.html:170
 #, python-format
 msgid "These organisations got %(sum)s € from the judiciary: "
 msgstr "Diese Organisationen erhielten %(sum)s € von der Justiz: "
 
-#: urls.py:16
-msgid "^recipient/(?P<slug>[\\w-]+)/$"
-msgstr "^empfaenger/(?P<slug>[\\w-]+)/$"
+#: urls.py:23
+msgid "^recipient/(?P<slug>[\\w\\~\\-]+)/$"
+msgstr "^empfaenger/(?P<slug>[\\w\\~\\-]+)/$"
 
 #~ msgid "Your search"
 #~ msgstr "Deine Suche"
