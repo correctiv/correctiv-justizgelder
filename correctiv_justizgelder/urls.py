@@ -20,7 +20,7 @@ def c(view):
 
 urlpatterns = patterns('',
     url(r'^$', c(OrganisationSearchView.as_view()), name='search'),
-    url(_(r'^recipient/(?P<slug>[\w\~\-]+)/$'),
+    url(_(r'^recipient/(?P<slug>[^/]+)/$'),
         c(OrganisationDetail.as_view()),
         name='organisation_detail'),
 )
