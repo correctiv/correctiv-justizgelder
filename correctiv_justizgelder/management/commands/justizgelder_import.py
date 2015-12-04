@@ -47,8 +47,7 @@ class Command(BaseCommand):
                     reference_id=row['id']
                 )
             except Fine.DoesNotExist:
-                pass
-            yield self.create_from_row(row, fine=fine)
+                yield self.create_from_row(row, fine=fine)
 
     def create_from_row(self, row, fine=None):
         if fine is None:
