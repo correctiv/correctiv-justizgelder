@@ -26,9 +26,12 @@ class Command(BaseCommand):
         )
 
         collection = []
+        bulk_insert_count = 0
         for fine in self.get_fine_objects(filename):
             collection.append(fine)
             if len(collection) > BULK_SIZE:
+                bulk_insert_count += 1
+                self.stdout.write('Bulk insert %d\n' % bulk_insert_count)
                 Fine.objects.bulk_create(collection)
                 collection = []
 
@@ -41,7 +44,7 @@ class Command(BaseCommand):
             fine = None
             try:
                 fine = Fine.objects.get(
-                    file_reference=row['id']
+                    reference_id=row['id']
                 )
             except Fine.DoesNotExist:
                 pass
