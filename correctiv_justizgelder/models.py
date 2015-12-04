@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 from django.db import models
-from django.db.models import Sum, Count, Max, F
+from django.db.models import Sum, Count, Max
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 
@@ -147,7 +147,7 @@ class Fine(models.Model):
     bank_details = models.TextField(blank=True)
     org_details = models.TextField(blank=True)
     filename = models.CharField(max_length=255)
-    reference_id = models.CharField(max_length=255)
+    reference_id = models.CharField(max_length=255, db_index=True)
 
     note = models.TextField(blank=True)
 
