@@ -198,8 +198,6 @@ class Fine(models.Model):
 
     @property
     def source_file_url(self):
-        if self.year < 2011 or self.year > 2013:
-            return ''
         if self.source_file:
             if not self.source_file.rsplit('.', 1)[0].endswith('_'):
                 # File is not 'secret'
