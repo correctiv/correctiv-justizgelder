@@ -33,8 +33,8 @@ setup(
     author_email='stefan.wehrmeyer@correctiv.org',
     packages=find_packages(),
     install_requires=[
-        'Django<1.8',
-        'djorm-ext-pgfulltext>=0.9.3'
+        'Django',
+        'djorm-ext-pgfulltext',
         'unicode-slugify',
     ],
     include_package_data=True,
