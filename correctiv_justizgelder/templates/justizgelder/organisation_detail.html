@@ -57,75 +57,77 @@
 
 <div class="row">
   <div class="col-lg-12">
-    <table class="table table-responsive">
-      <thead>
-        <tr>
-          <th>
-            {% trans "Name of this organisation" %}
-          </th>
-          <th class="text-right">
-            {% trans "Amount" %}
-          </th>
-          <th>
-            {% trans "State" %}
-          </th>
-          <th>
-            {% trans "Year" %}
-          </th>
-          <th>
-            {% trans "Judicial district" %}
-          </th>
-          <th>
-            {% trans "Source" %}
-          </th>
-          <th>
-            {% trans "Details" %}
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-      {% with fines=object.fines.all_with_amount %}
-        {% for fine in fines %}
-        <tr>
-          <td>
-            {{ fine.name }}
-          </td>
-          <td class="text-right">
-            {{ fine.amount|intcomma_floatformat:2 }}&nbsp;€
-          </td>
-          <td>{{ fine.state_label }}</td>
-          <td>{{ fine.year }}</td>
-          <td>{{ fine.department_label }}</td>
-          <td>
-            {% with source_file=fine.source_file_url %}
-              {% if source_file %}
-                <a href="{{ MEDIA_URL }}{{ source_file }}" target="_blank">
-                  {{ fine.source_file_extension|upper }}
-                </a>
-              {% else %}
-                {% trans "not yet available" %}
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>
+              {% trans "Name of this organisation" %}
+            </th>
+            <th class="text-right">
+              {% trans "Amount" %}
+            </th>
+            <th>
+              {% trans "State" %}
+            </th>
+            <th>
+              {% trans "Year" %}
+            </th>
+            <th>
+              {% trans "Judicial district" %}
+            </th>
+            <th>
+              {% trans "Source" %}
+            </th>
+            <th>
+              {% trans "Details" %}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+        {% with fines=object.fines.all_with_amount %}
+          {% for fine in fines %}
+          <tr>
+            <td>
+              {{ fine.name }}
+            </td>
+            <td class="text-right">
+              {{ fine.amount|intcomma_floatformat:2 }}&nbsp;€
+            </td>
+            <td>{{ fine.state_label }}</td>
+            <td>{{ fine.year }}</td>
+            <td>{{ fine.department_label }}</td>
+            <td>
+              {% with source_file=fine.source_file_url %}
+                {% if source_file %}
+                  <a href="{{ MEDIA_URL }}{{ source_file }}" target="_blank">
+                    {{ fine.source_file_extension|upper }}
+                  </a>
+                {% else %}
+                  {% trans "not yet available" %}
+                {% endif %}
+              {% endwith %}
+            </td>
+            <td class="text-muted">
+              {% if fine.note %}
+                <p>
+                  {% trans "Notes" as notes %}
+                  <a href="#" class="note" data-toggle="popover" title="{{ notes }}" data-content="{{ fine.note }}">{{ notes }}</a>
+                </p>
               {% endif %}
-            {% endwith %}
-          </td>
-          <td class="text-muted">
-            {% if fine.note %}
-              <p>
-                {% trans "Notes" as notes %}
-                <a href="#" class="note" data-toggle="popover" title="{{ notes }}" data-content="{{ fine.note }}">{{ notes }}</a>
-              </p>
-            {% endif %}
-            {% if fine.city or fine.postcode %}
-              {{ fine.city }} {{ fine.postcode }}<br/>
-            {% endif %}
-            {% if fine.address %}
-              {{ fine.address|linebreaksbr }}<br/>
-            {% endif %}
-          </td>
-        </tr>
-        {% endfor %}
-      {% endwith %}
-      </tbody>
-    </table>
+              {% if fine.city or fine.postcode %}
+                {{ fine.city }} {{ fine.postcode }}<br/>
+              {% endif %}
+              {% if fine.address %}
+                {{ fine.address|linebreaksbr }}<br/>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        {% endwith %}
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 </div>
