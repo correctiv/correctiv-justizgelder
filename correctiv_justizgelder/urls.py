@@ -1,6 +1,6 @@
 from functools import wraps
 
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.cache import cache_page
 
@@ -18,9 +18,9 @@ def c(view):
     return cache_page_anonymous
 
 
-urlpatterns = patterns('',
+urlpatterns = [
     url(r'^$', c(OrganisationSearchView.as_view()), name='search'),
     url(_(r'^recipient/(?P<slug>[^/]+)/$'),
         c(OrganisationDetail.as_view()),
         name='organisation_detail'),
-)
+]
