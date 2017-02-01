@@ -72,7 +72,7 @@ class OrganisationSearchForm(forms.Form):
 
     def search(self):
         if not self.is_valid():
-            return Organisation.objects.all(), {}
+            return Organisation.objects.search()
 
         sqs = self._search(self.cleaned_data['q'])
 

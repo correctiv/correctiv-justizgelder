@@ -39,8 +39,8 @@ class OrganisationManager(models.Manager):
             fine_filter['search_index__ft_startswith'] = query
             filters['fines__search_index__ft_startswith'] = query
 
-        amount_lte = kwargs.pop('amount__lte')
-        amount_gte = kwargs.pop('amount__gte')
+        amount_lte = kwargs.pop('amount__lte', None)
+        amount_gte = kwargs.pop('amount__gte', None)
 
         for key, val in kwargs.items():
             if val is not None and val != '':
@@ -48,7 +48,7 @@ class OrganisationManager(models.Manager):
 
         q = Organisation.objects.filter(**filters)
 
-        if filters:
+        if filters or amount_lte is not None or amount_gte is not None:
             amount_col = 'filtered_amount'
             q = q.annotate(
                 filtered_amount=Sum('fines__amount'),
