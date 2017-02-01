@@ -133,7 +133,7 @@ class Command(BaseCommand):
         cursor = con.cursor()
         cursor.execute("""UPDATE correctiv_justizgelder_organisation
             SET sum_fines=(
-                SELECT SUM(correctiv_justizgelder_fine.amount) FROM
+                SELECT COALESCE(SUM(correctiv_justizgelder_fine.amount), 0) FROM
                  correctiv_justizgelder_fine WHERE
                   correctiv_justizgelder_fine.organisation_id=correctiv_justizgelder_organisation.id
         );""")
