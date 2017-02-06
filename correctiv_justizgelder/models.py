@@ -3,9 +3,36 @@ from django.db import models
 from django.db.models import Sum, Count, Max
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.postgres.search import (SearchVectorField, SearchVector,
+        SearchVectorExact, SearchQuery)
 
-from djorm_pgfulltext.models import SearchManager
-from djorm_pgfulltext.fields import VectorField
+SEARCH_LANG = 'german'
+
+
+class SearchVectorStartsWith(SearchVectorExact):
+    """This lookup scans for full text index entries that BEGIN with
+    a given phrase, like:
+    will get translated to
+        ts_query('Foobar:* & Baz:* & Quux:*')
+    """
+    lookup_name = 'startswith'
+
+    def process_rhs(self, qn, connection):
+        if not hasattr(self.rhs, 'resolve_expression'):
+            config = getattr(self.lhs, 'config', None)
+            self.rhs = SearchQuery(self.rhs, config=config)
+        rhs, rhs_params = super(SearchVectorExact, self).process_rhs(qn, connection)
+        rhs = '(to_tsquery(%s::regconfig, %s))'
+        rhs_params[1] = ' & '.join('%s:*' % s for s in rhs_params[1].split())
+        return rhs, rhs_params
+
+    def as_sql(self, qn, connection):
+        lhs, lhs_params = self.process_lhs(qn, connection)
+        rhs, rhs_params = self.process_rhs(qn, connection)
+        params = lhs_params + rhs_params
+        return '%s @@ %s' % (lhs, rhs), params
+
+SearchVectorField.register_lookup(SearchVectorStartsWith)
 
 
 GERMAN_STATES = (
@@ -35,9 +62,9 @@ class OrganisationManager(models.Manager):
         filters = {}
         fine_filter = {}
         if query:
-            query = query.strip().encode('utf-8').split()
-            fine_filter['search_index__ft_startswith'] = query
-            filters['fines__search_index__ft_startswith'] = query
+            query = SearchQuery(query.strip(), config=SEARCH_LANG)
+            fine_filter['search_vector__startswith'] = query
+            filters['fines__search_vector__startswith'] = query
 
         amount_lte = kwargs.pop('amount__lte', None)
         amount_gte = kwargs.pop('amount__gte', None)
@@ -111,7 +138,18 @@ class Organisation(models.Model):
         return getattr(self, 'filtered_amount', self.sum_fines)
 
 
-class FineManager(SearchManager):
+class FineManager(models.Manager):
+    def update_search_index(self):
+        search_vector = (
+            SearchVector('name', weight='A', config=SEARCH_LANG) +
+            SearchVector('city', weight='B', config=SEARCH_LANG) +
+            SearchVector('postcode', weight='C', config=SEARCH_LANG) +
+            SearchVector('address', weight='D', config=SEARCH_LANG) +
+            SearchVector('department_detail', weight='D',
+                         config=SEARCH_LANG)
+        )
+        Fine.objects.update(search_vector=search_vector)
+
     def all_with_amount(self):
         return self.get_queryset().exclude(amount=0.0)
 
@@ -156,20 +194,7 @@ class Fine(models.Model):
 
     treasury = models.BooleanField(default=False, db_index=True)
 
-    search_index = VectorField()
-
-    objects = FineManager(
-        fields=[
-            ('name', 'A'),
-            ('city', 'B'),
-            ('postcode', 'C'),
-            ('address', 'D'),
-            ('department_detail', 'D'),
-        ],
-        config='pg_catalog.german',
-        search_field='search_index',
-        auto_update_search_field=True
-    )
+    search_vector = SearchVectorField(null=True)
 
     objects = FineManager()
 
