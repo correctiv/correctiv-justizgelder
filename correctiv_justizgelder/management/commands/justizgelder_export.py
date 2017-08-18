@@ -4,6 +4,7 @@ import unicodecsv
 from django.core.management.base import BaseCommand
 from django.utils import translation
 from django.conf import settings
+from django.utils.six import text_type
 
 from ...models import Fine
 
@@ -35,5 +36,5 @@ class Command(BaseCommand):
         writer.writeheader()
         qs = Fine.objects.iterator()
         for fine in qs:
-            writer.writerow(dict([(v, unicode(getattr(fine, k))) for k, v in
+            writer.writerow(dict([(v, text_type(getattr(fine, k))) for k, v in
                             fields.items() if getattr(fine, k, None) is not None]))

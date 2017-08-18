@@ -35,6 +35,8 @@ setup(
     install_requires=[
         'Django>=1.10',
         'unicode-slugify',
+        'unicodecsv',
+        'tqdm',
     ],
     include_package_data=True,
     classifiers=[

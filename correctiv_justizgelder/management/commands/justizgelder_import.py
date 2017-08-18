@@ -1,6 +1,7 @@
 import decimal
-import unicodecsv
 
+import unicodecsv
+from tqdm import tqdm
 from slugify import slugify
 
 from django.core.management.base import BaseCommand
@@ -15,10 +16,13 @@ BULK_SIZE = 1000
 class Command(BaseCommand):
     help = "Import CSV"
 
+    def add_arguments(self, parser):
+        parser.add_argument('filename', help='filename')
+
     def handle(self, *args, **options):
         translation.activate(settings.LANGUAGE_CODE)
 
-        filename = args[0]
+        filename = options['filename']
 
         self.staatskasse, created = Organisation.objects.get_or_create(
             name='Staatskasse', slug='staatskasse',
@@ -40,7 +44,7 @@ class Command(BaseCommand):
         self.create_aggregates()
 
     def get_fine_objects(self, filename):
-        for row in unicodecsv.DictReader(open(filename)):
+        for row in tqdm(unicodecsv.DictReader(open(filename))):
             fine = None
             try:
                 fine = Fine.objects.get(
@@ -53,7 +57,7 @@ class Command(BaseCommand):
         if fine is None:
             fine = Fine()
 
-        org_slug = slugify(row['name'], only_ascii=True)
+        org_slug = slugify(row['name'])
         old_org_slug = slugify(row['name'])
 
         if org_slug != old_org_slug:
@@ -95,7 +99,7 @@ class Command(BaseCommand):
         fine.address = row['adresse']
         fine.file_reference = row['aktenzeichen']
         fine.filename = row['path']
-        fine.note = row['anmerkungen']
+        # fine.note = row['anmerkungen']
         fine.source_file = row['source']
         fine.reference_id = row['id']
         fine.city = row['ort']
@@ -109,16 +113,7 @@ class Command(BaseCommand):
                 'bank',
             ) if row.get(k))
 
-        fine.org_details = u'\n'.join(
-            row.get(k) for k in (
-                'kategorie',
-                'notizen',
-                'rest',
-                'thema',
-                'vorsitzender',
-                'wirkungskreis',
-                'zu_haenden'
-            ) if row.get(k))
+        fine.org_details = row.get('anmerkungen', '')
 
         return fine
 
