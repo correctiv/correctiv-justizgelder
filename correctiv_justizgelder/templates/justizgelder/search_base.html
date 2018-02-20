@@ -42,11 +42,6 @@
                         <button class="btn btn-default" type="submit">{% trans "Search" %}</button>
                     </span>
                 </div><!-- /input-group -->
-                <div class="pull-right treasury-selection">
-                    <p>
-                      {{ form.treasury }}
-                    </p>
-                </div>
             </form>
         </div>
     </div>
@@ -217,9 +212,6 @@
             $('#amount_lte_label').text(val[1] + ' T€');
         }).trigger('slide');
         $('.radio-inline').click(function(){
-            $(this).parents('form').submit();
-        });
-        $('#id_treasury').change(function(){
             $(this).parents('form').submit();
         });
         $('.js-info-modal').click(function(e){

@@ -28,18 +28,6 @@ class OrganisationSearchForm(forms.Form):
         required=False,
         widget=forms.HiddenInput)
 
-    treasury = forms.TypedChoiceField(
-        label=_('Include treasury'),
-        choices=[
-            ('', _('Exclude treasury')),
-            ('1', _('Include treasury')),
-        ],
-        initial='',
-        empty_value=False,
-        required=False,
-        coerce=lambda x: None
-    )
-
     MIN_YEAR, MAX_YEAR = 2007, 2016
     year = forms.TypedChoiceField(
         choices=[

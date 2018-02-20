@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-03 15:58+0100\n"
+"POT-Creation-Date: 2018-02-20 16:14+0100\n"
 "PO-Revision-Date: 2015-11-03 15:59+0100\n"
 "Last-Translator: Stefan Wehrmeyer <stefan.wehrmeyer@okfn.org>\n"
 "Language-Team: \n"
@@ -18,7 +18,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 1.7.5\n"
 
-#: cms_app.py:9
+#: cms_apps.py:9
 msgid "Court Donations Database"
 msgstr "Justizgelder-Datenbank"
 
@@ -30,95 +30,87 @@ msgstr "Suchen"
 msgid "e.g. Polizeisport"
 msgstr "z.B. Polizeisport"
 
-#: forms.py:32 forms.py:35
-msgid "Include treasury"
-msgstr "Mit Staatskasse"
-
-#: forms.py:34
-msgid "Exclude treasury"
-msgstr "Ohne Staatskasse"
-
-#: models.py:12
+#: models.py:41
 msgid "Baden-Württemberg"
 msgstr "Baden-Württemberg"
 
-#: models.py:13
+#: models.py:42
 msgid "Bavaria"
 msgstr "Bayern"
 
-#: models.py:14
+#: models.py:43
 msgid "Berlin"
 msgstr "Berlin"
 
-#: models.py:15
+#: models.py:44
 msgid "Brandenburg"
 msgstr "Brandenburg"
 
-#: models.py:16
+#: models.py:45
 msgid "Bremen"
 msgstr "Bremen"
 
-#: models.py:17
+#: models.py:46
 msgid "Hamburg"
 msgstr "Hamburg"
 
-#: models.py:18
+#: models.py:47
 msgid "Hesse"
 msgstr "Hessen"
 
-#: models.py:19
+#: models.py:48
 msgid "Mecklenburg-Western Pomerania"
 msgstr "Mecklenburg-Vorpommern"
 
-#: models.py:20
+#: models.py:49
 msgid "Lower Saxony"
 msgstr "Niedersachsen"
 
-#: models.py:21
+#: models.py:50
 msgid "North Rhine-Westphalia"
 msgstr "Nordrhein-Westfalen"
 
-#: models.py:22
+#: models.py:51
 msgid "Rhineland-Palatinate"
 msgstr "Rheinland-Pfalz"
 
-#: models.py:23
+#: models.py:52
 msgid "Saarland"
 msgstr "Saarland"
 
-#: models.py:24
+#: models.py:53
 msgid "Saxony"
 msgstr "Sachsen"
 
-#: models.py:25
+#: models.py:54
 msgid "Saxony-Anhalt"
 msgstr "Sachsen-Anhalt"
 
-#: models.py:26
+#: models.py:55
 msgid "Schleswig-Holstein"
 msgstr "Schleswig-Holstein"
 
-#: models.py:27
+#: models.py:56
 msgid "Thuringia"
 msgstr "Thüringen"
 
-#: models.py:122
+#: models.py:162
 msgid "Prosecutor"
 msgstr "Staatsanwaltschaft"
 
-#: models.py:123
+#: models.py:163
 msgid "Ministry of Justice"
 msgstr "Justizministerium"
 
-#: models.py:124
+#: models.py:164
 msgid "State Court"
 msgstr "Landgericht"
 
-#: models.py:125
+#: models.py:165
 msgid "Local Court"
 msgstr "Amtsgericht"
 
-#: models.py:126
+#: models.py:166
 msgid "Upper State Court"
 msgstr "Oberlandesgericht"
 
@@ -177,43 +169,43 @@ msgstr "Zurück zur Suche"
 msgid "Notes about this organisation"
 msgstr "Anmerkungen zu dieser Organisation"
 
-#: templates/justizgelder/organisation_detail.html:64
+#: templates/justizgelder/organisation_detail.html:65
 msgid "Name of this organisation"
 msgstr "Name dieser Organisation"
 
-#: templates/justizgelder/organisation_detail.html:67
+#: templates/justizgelder/organisation_detail.html:68
 msgid "Amount"
 msgstr "Betrag"
 
-#: templates/justizgelder/organisation_detail.html:70
+#: templates/justizgelder/organisation_detail.html:71
 msgid "State"
 msgstr "Bundesland"
 
-#: templates/justizgelder/organisation_detail.html:73
+#: templates/justizgelder/organisation_detail.html:74
 msgid "Year"
 msgstr "Jahr"
 
-#: templates/justizgelder/organisation_detail.html:76
+#: templates/justizgelder/organisation_detail.html:77
 msgid "Judicial district"
 msgstr "Justizbezirk"
 
-#: templates/justizgelder/organisation_detail.html:79
+#: templates/justizgelder/organisation_detail.html:80
 msgid "Source"
 msgstr "Quelle"
 
-#: templates/justizgelder/organisation_detail.html:82
+#: templates/justizgelder/organisation_detail.html:83
 msgid "Details"
 msgstr "Details"
 
-#: templates/justizgelder/organisation_detail.html:106
+#: templates/justizgelder/organisation_detail.html:107
 msgid "not yet available"
 msgstr "noch nicht verfügbar"
 
-#: templates/justizgelder/organisation_detail.html:113
+#: templates/justizgelder/organisation_detail.html:114
 msgid "Notes"
 msgstr "Anmerkungen"
 
-#: templates/justizgelder/organisation_detail.html:137
+#: templates/justizgelder/organisation_detail.html:139
 #, python-format
 msgid "%(name)s received %(sum)s € from the judiciary: "
 msgstr "%(name)s erhielt %(sum)s € von der Justiz: "
@@ -233,11 +225,7 @@ msgstr ""
 "        <strong>%(sum)s&nbsp;€</strong>\n"
 "        "
 
-#: templates/justizgelder/search.html:19
-msgid "Filters: "
-msgstr "Filter: "
-
-#: templates/justizgelder/search.html:31
+#: templates/justizgelder/search.html:15
 #, python-format
 msgid ""
 "\n"
@@ -250,22 +238,26 @@ msgstr ""
 "        <strong>%(sum)s&nbsp;€</strong>\n"
 "        "
 
-#: templates/justizgelder/search.html:42
+#: templates/justizgelder/search.html:27
+msgid "Filters: "
+msgstr "Filter: "
+
+#: templates/justizgelder/search.html:49
 msgid "Name of Organisation"
 msgstr "Name der Einrichtung"
 
-#: templates/justizgelder/search.html:45
+#: templates/justizgelder/search.html:52
 msgid "Total Amount"
 msgstr "Gesamtbetrag"
 
-#: templates/justizgelder/search.html:57
+#: templates/justizgelder/search.html:64
 #, python-format
 msgid "One documented entry"
 msgid_plural "%(count)s documented entries"
 msgstr[0] "Ein dokumentierter Eintrag"
 msgstr[1] "%(count)s dokumentierte Einträge"
 
-#: templates/justizgelder/search.html:67
+#: templates/justizgelder/search.html:74
 msgid "No results found"
 msgstr "Keine Ergebnisse gefunden"
 
@@ -277,26 +269,26 @@ msgstr "Suche nach Zuwendungen der Justiz"
 msgid "Search for recipients"
 msgstr "Suche nach Zuwendungsempfängern"
 
-#: templates/justizgelder/search_base.html:58
+#: templates/justizgelder/search_base.html:53
 msgid "Set range of total amount"
 msgstr "Gesamtbetrag einschränken"
 
-#: templates/justizgelder/search_base.html:76
+#: templates/justizgelder/search_base.html:71
 msgid "Allocated in"
 msgstr "Zugewiesen in"
 
-#: templates/justizgelder/search_base.html:85
-#: templates/justizgelder/search_base.html:88
-#: templates/justizgelder/search_base.html:129
-#: templates/justizgelder/search_base.html:132
+#: templates/justizgelder/search_base.html:80
+#: templates/justizgelder/search_base.html:83
+#: templates/justizgelder/search_base.html:124
+#: templates/justizgelder/search_base.html:127
 msgid "All"
 msgstr "Alle"
 
-#: templates/justizgelder/search_base.html:120
+#: templates/justizgelder/search_base.html:115
 msgid "In the year"
 msgstr "Im Jahr"
 
-#: templates/justizgelder/search_base.html:170
+#: templates/justizgelder/search_base.html:165
 #, python-format
 msgid "These organisations got %(sum)s € from the judiciary: "
 msgstr "Diese Organisationen erhielten %(sum)s € von der Justiz: "
@@ -304,6 +296,12 @@ msgstr "Diese Organisationen erhielten %(sum)s € von der Justiz: "
 #: urls.py:23
 msgid "^recipient/(?P<slug>[^/]+)/$"
 msgstr "^empfaenger/(?P<slug>[\\w\\~\\-]+)/$"
+
+#~ msgid "Include treasury"
+#~ msgstr "Mit Staatskasse"
+
+#~ msgid "Exclude treasury"
+#~ msgstr "Ohne Staatskasse"
 
 #~ msgid "Your search"
 #~ msgstr "Deine Suche"
